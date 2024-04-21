@@ -15,6 +15,10 @@ import {
 	AdditiveBlending,
 	MeshBasicMaterial,
 	MeshStandardMaterial,
+	MeshLambertMaterial,
+	LineBasicMaterial,
+	EdgesGeometry,
+	LineSegments,
 	Group,
 	Mesh,
 } from 'three'
@@ -57,15 +61,20 @@ export default class Model {
 				const replacementMaterial = new MeshMatcapMaterial({
 					matcap: this.defaultMatcap,
 				})
-				const material = new MeshStandardMaterial({
-					color: 0x5555ff, 
-					metalness: 0,  
-					roughness: 0.4,
-					transparent: 0.2
+				const material = new MeshLambertMaterial({
+					color: 0x004444,
+					transparent: true,
+					opacity: 0.5
 				});
 				gltf.scene.traverse((child) => {
 					if (child.isMesh) {
 						child.material = material
+						const edges = new EdgesGeometry(child.geometry, -10);
+						const edgesMaterial = new LineBasicMaterial({
+						color: 0x00ffff,
+					})
+						const line = new LineSegments(edges, edgesMaterial);
+						child.add(line)
 					}
 				})
 			}

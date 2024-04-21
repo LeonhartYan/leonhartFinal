@@ -14,7 +14,7 @@ const camera = new THREE.PerspectiveCamera(
 	0.1,
 	100
 )
-camera.position.set(0, 0, 5)
+camera.position.set(0, 2, 5)
 
 //Globals
 const meshes = {}
@@ -51,10 +51,10 @@ function init() {
 function models() {
 	const Ship = new Model({
 		name: 'ship',
-		url: '/SB.glb',
+		url: '/sbneko.glb',
 		scene: scene,
 		meshes: meshes,
-		scale: new THREE.Vector3(0.5, 0.5, -0.5),
+		scale: new THREE.Vector3(0.6, 0.6, -0.6),
 		position: new THREE.Vector3(0, 0, -1),
 		replace: true,
 		//replaceURL: '/newMatcap.png',
