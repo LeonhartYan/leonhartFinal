@@ -7,6 +7,7 @@ import { AfterimagePass } from 'three/examples/jsm/postprocessing/AfterimagePass
 import { RenderPixelatedPass } from 'three/examples/jsm/postprocessing/RenderPixelatedPass'
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js'
 import { Mesh, Vector2 } from 'three'
+import { AsciiEffect } from 'three/examples/jsm/Addons.js'
 
 export function postprocessing(scene, camera, renderer) {
 	console.log(camera)
@@ -14,8 +15,11 @@ export function postprocessing(scene, camera, renderer) {
 	composer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 	composer.setSize(window.innerWidth, window.innerHeight)
 
-	// document.body.appendChild(renderer.domElement)
-	// composer.addPass(effect)
+	const effect = new AsciiEffect(renderer, ' .:-+*=%@#', { invert: true })
+	effect.setSize(window.innerWidth, window.innerHeight)
+	effect.domElement.style.color = 'white'
+	effect.domElement.style.backgroundColor = 'black'
+	composer.addPass(effect)
 
 	const renderPass = new RenderPass(scene, camera)
 	composer.addPass(renderPass)
@@ -35,7 +39,6 @@ export function postprocessing(scene, camera, renderer) {
 	outlinePass.visibleEdgeColor.set('green')
 	outlinePass.hiddenEdgeColor.set('green')
 	// outlinePass.selectedObjects = []
-	outlinePass.enabled = false
 	composer.addPass(outlinePass)
 	const afterPass = new AfterimagePass()
 	afterPass.uniforms.damp.value = 0.899

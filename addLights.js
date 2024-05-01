@@ -5,3 +5,9 @@ export function addLight() {
 	light.position.set(1, 1, 1)
 	return light
 }
+
+export function addFlame() {
+	const flame = new THREE.PointLight(0xffffff, 1)
+	flame.position.set(-2, 0, 0)
+	return flame
+}

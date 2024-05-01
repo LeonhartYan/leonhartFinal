@@ -35,7 +35,6 @@ export function postprocessing(scene, camera, renderer) {
 	outlinePass.visibleEdgeColor.set('green')
 	outlinePass.hiddenEdgeColor.set('green')
 	// outlinePass.selectedObjects = []
-	outlinePass.enabled = false
 	composer.addPass(outlinePass)
 	const afterPass = new AfterimagePass()
 	afterPass.uniforms.damp.value = 0.899

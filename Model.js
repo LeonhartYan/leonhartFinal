@@ -21,6 +21,7 @@ import {
 	LineSegments,
 	Group,
 	Mesh,
+	Box3,
 } from 'three'
 
 export default class Model {
@@ -36,6 +37,8 @@ export default class Model {
 		this.textureLoader = new TextureLoader()
 		this.animations = obj.animationState || false
 		this.replaceMaterials = obj.replace || false
+		this.follow = obj.follow
+		this.default = obj.default
 		this.defaultMatcap = obj.replaceURL
 			? this.textureLoader.load(`${obj.replaceURL}`)
 			: this.textureLoader.load('/mat.png')
@@ -44,6 +47,7 @@ export default class Model {
 		this.defaultParticle = obj.particleURL
 			? this.textureLoader.load(`${obj.particleURL}`)
 			: this.textureLoader.load('/10.png')
+		this.hitbox = new Box3()
 		this.scale = obj.scale || new Vector3(1, 1, 1)
 		this.position = obj.position || new Vector3(0, 0, 0)
 		this.rotation = obj.rotation || new Vector3(0, 0, 0)
@@ -64,16 +68,16 @@ export default class Model {
 				const material = new MeshLambertMaterial({
 					color: 0x004444,
 					transparent: true,
-					opacity: 0.5
-				});
+					opacity: 0.5,
+				})
 				gltf.scene.traverse((child) => {
 					if (child.isMesh) {
 						child.material = material
-						const edges = new EdgesGeometry(child.geometry, -10);
+						const edges = new EdgesGeometry(child.geometry, -10)
 						const edgesMaterial = new LineBasicMaterial({
-						color: 0x00ffff,
-					})
-						const line = new LineSegments(edges, edgesMaterial);
+							color: 0x00ffff,
+						})
+						const line = new LineSegments(edges, edgesMaterial)
 						child.add(line)
 					}
 				})
@@ -102,6 +106,7 @@ export default class Model {
 				this.rotation.z
 			)
 			this.meshes[`${this.name}`].userData.groupName = this.name
+			this.meshes[`${this.name}`].add(this.follow)
 			this.scene.add(this.meshes[`${this.name}`])
 		})
 	}
