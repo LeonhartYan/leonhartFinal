@@ -170,9 +170,11 @@ function models() {
 		//replaceURL: '/newMatcap.png',
 		mixers: mixers,
 		follow: follow,
-		default: meshes.default
 	})
 	Ship.init()
+	const hitboxShip = new THREE.Box3()
+	Ship.hitbox = hitboxShip
+	Ship.
 }
 
 function resize() {
@@ -261,6 +263,12 @@ function animate() {
 		goal.position.addScaledVector(dir, dis)
 		goal.position.lerp(temp, 0.1)
 		temp.setFromMatrixPosition(follow.matrixWorld)
+		for(var i=0; i< 30; i++){
+		if(meshes.ship.hitbox.intersectsBox(meshes.asteroids[i])){
+			meshes.asteroids[i].position.set(Math.random() * 30, Math.random() * 30, camera.position.z * 30)
+			console.log('collied')
+		}
+	}
 		camera.lookAt(meshes.group.position)
 	}
 	requestAnimationFrame(animate)

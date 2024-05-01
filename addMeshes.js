@@ -86,6 +86,8 @@ export function addAsteroids() {
 	})
 	const line = new THREE.LineSegments(edges, edgesMaterial)
 	mesh.add(line)
+	const hitbox = new THREE.Box3()
+	mesh.add(hitbox)
 	mesh.velocity = Math.random() * 2 + 2
 	mesh.vRotation = new THREE.Vector3(Math.random(), Math.random(), Math.random())
 	mesh.position.set(Math.floor(Math.random() * (max - min + 1)) + min, Math.floor(Math.random() * (max - min + 1)) + min, Math.floor(Math.random() * (max - min + 1)) + min)

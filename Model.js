@@ -38,7 +38,6 @@ export default class Model {
 		this.animations = obj.animationState || false
 		this.replaceMaterials = obj.replace || false
 		this.follow = obj.follow
-		this.default = obj.default
 		this.defaultMatcap = obj.replaceURL
 			? this.textureLoader.load(`${obj.replaceURL}`)
 			: this.textureLoader.load('/mat.png')
@@ -47,7 +46,7 @@ export default class Model {
 		this.defaultParticle = obj.particleURL
 			? this.textureLoader.load(`${obj.particleURL}`)
 			: this.textureLoader.load('/10.png')
-		this.hitbox = new Box3()
+		this.hitbox = obj.hitbox
 		this.scale = obj.scale || new Vector3(1, 1, 1)
 		this.position = obj.position || new Vector3(0, 0, 0)
 		this.rotation = obj.rotation || new Vector3(0, 0, 0)
