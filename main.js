@@ -16,18 +16,21 @@ const camera = new THREE.PerspectiveCamera(
 	0.1,
 	100
 )
-camera.position.set(0, 2.0, 0)
+camera.position.set(0, 1.25, 0)
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
 var time = 0
 var newPosition = new THREE.Vector3()
 var matrix = new THREE.Matrix4()
-
+var state
+var shot = false
 var stop = 1
 var DEGTORAD = 0.01745327
 var temp = new THREE.Vector3()
 var dir = new THREE.Vector3()
 var a = new THREE.Vector3()
 var b = new THREE.Vector3()
-var coronaSafetyDistance = 5.5
+var coronaSafetyDistance = 5.0
 var velocityVertical = 0.0
 var velocityHoriontal = 0.0
 var velocityHoriontal2 = 0.0
@@ -35,6 +38,7 @@ var speedVertical = 0.0
 var speedHorizontal = 0.0
 var speedHorizontal2 = 0.0
 var rotateHorizontal = 0.0
+var rotateVertical = 0.0
 var boost = 0.0
 let goal, follow
 const keys = {
@@ -44,6 +48,9 @@ const keys = {
 	w: false,
 	q: false,
 	e: false,
+	z: false,
+	x: false,
+	c: false,
 }
 
 goal = new THREE.Object3D()
@@ -109,6 +116,7 @@ function init() {
 	document.body.appendChild(renderer.domElement)
 	document.body.appendChild(effect.domElement)
 
+	raycaster.setFromCamera(pointer, camera)
 	//meshes
 	meshes.default = addBoilerPlateMesh()
 	meshes.default2 = addBoilerPlateMesh2()
@@ -124,7 +132,7 @@ function init() {
 	meshes.group.add(meshes.flame1)
 	meshes.group.add(meshes.flame2)
 	//lights
-	for(var i=0; i< 30; i++){
+	for(let i = 0; i < meshes.asteroids.length; i++){
 		meshes.asteroids[i].rotateY(Math.random() * 40)
 		meshes.asteroids[i].rotateZ(Math.random() * 40)
 		meshes.asteroids[i].rotateX(Math.random() * 40)
@@ -133,19 +141,25 @@ function init() {
 	meshes.default.scale.set(2, 2, 2)
 	meshes.default2.scale.set(2, 2, 2)
 
-	composer = postprocessing(scene, camera, renderer)
+	composer = postprocessing(scene, camera, renderer, state)
 
 	goal.add(camera)
 	//scene operations
 	scene.add(meshes.group)
-	for(var i=0; i< 30; i++){
+	for(let i = 0; i < meshes.asteroids.length; i++){
 		scene.add(meshes.asteroids[i])
 	}
 	scene.add(lights.defaultLight)
 	keySetup()
 	models()
 	resize()
+	shotAmmo()
 	animate()
+}
+function onPointerMove( event ) {
+	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
 }
 
 function keySetup() {
@@ -156,6 +170,25 @@ function keySetup() {
 	window.addEventListener('keyup', (e) => {
 		if (keys[e.key] !== undefined) keys[e.key] = false
 	})
+}
+
+function shotAmmo() {
+	var ammos = []
+	var position = new THREE.Vector3();
+    position.copy(raycaster.ray.origin);
+    var direction = new THREE.Vector3();
+    direction.copy(raycaster.ray.direction);
+	if (shot == true){
+	const ammoDia = new THREE.SphereGeometry(0.3)
+	const ammoMat = new THREE.MeshBasicMaterial({
+			color: 0xff0000,
+			transparent: true,
+			opacity: 0.5		
+		})
+	const ammo = new THREE.Mesh(ammoDia, ammoMat)
+	ammo.position.copy(position)
+		ammos.push(ammo)
+	}
 }
 
 function models() {
@@ -172,9 +205,6 @@ function models() {
 		follow: follow,
 	})
 	Ship.init()
-	const hitboxShip = new THREE.Box3()
-	Ship.hitbox = hitboxShip
-	Ship.
 }
 
 function resize() {
@@ -191,16 +221,16 @@ function resize() {
 }
 
 function animate() {
+	window.addEventListener( 'pointermove', onPointerMove );
 	boost = 0.02
 	const delta = clock.getDelta()
 	meshes.default.rotation.x += 0.01
 	meshes.default.rotation.z += 0.01
 	meshes.default2.rotation.x += 0.01
 	meshes.default2.rotation.z += 0.01
-	for(var i=0; i< 30; i++){
+	for(let i = 0; i < meshes.asteroids.length; i++){
 		meshes.asteroids[i].rotateY(0.001)
 	}
-
 	// meshes.default.scale.x += 0.01
 	//
 	// console.log(composer)
@@ -209,7 +239,12 @@ function animate() {
 	speedHorizontal = 0.0
 	speedHorizontal2 = 0.0
 	rotateHorizontal = 0.0
-
+	rotateVertical = 0.0
+	speedVertical = pointer.y / 60
+	rotateHorizontal = -pointer.x / 80
+	if (keys.z){
+		shot = true
+	}
 	if (keys.e) {speedVertical = -0.03
 		speedHorizontal = -0.01
 		boost = 1}
@@ -235,6 +270,17 @@ function animate() {
 	velocityVertical += (speedVertical - velocityVertical) * 0.5
 	velocityHoriontal += (speedHorizontal - velocityHoriontal) * 0.5
 	velocityHoriontal2 += (speedHorizontal2 - velocityHoriontal2) * 0.5
+	
+	if(keys.x){
+		state += 1
+	}
+	if(state === 0){
+		asciiEffectEnabled = false
+	}else if(state === 1){
+		asciiEffectEnabled = true
+	}else if(state === 2){
+		asciiEffectEnabled = false
+	}
 	if (asciiEffectEnabled) {
 		renderer.clear()
 
@@ -263,12 +309,14 @@ function animate() {
 		goal.position.addScaledVector(dir, dis)
 		goal.position.lerp(temp, 0.1)
 		temp.setFromMatrixPosition(follow.matrixWorld)
-		for(var i=0; i< 30; i++){
-		if(meshes.ship.hitbox.intersectsBox(meshes.asteroids[i])){
-			meshes.asteroids[i].position.set(Math.random() * 30, Math.random() * 30, camera.position.z * 30)
-			console.log('collied')
+		for(let i = 0; i < meshes.asteroids.length; i++){
+			const shipBox = new THREE.Box3().setFromObject(meshes.ship)
+			const roidBox = new THREE.Box3().setFromObject(meshes.asteroids[i])
+			if(shipBox.intersectsBox(roidBox)){
+				meshes.group.position.set(0, 0, 0)
+				break
+			}
 		}
-	}
 		camera.lookAt(meshes.group.position)
 	}
 	requestAnimationFrame(animate)
