@@ -17,14 +17,15 @@ const camera = new THREE.PerspectiveCamera(
 	100
 )
 camera.position.set(0, 1, 0)
-var gridHelper = new THREE.GridHelper( 400, 400, '0x84ffff');
+//var gridHelper = new THREE.GridHelper( 400, 400, '0x84ffff');
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 var score = 0
 var health = 100
+var sneak = false
 var ammos = []
 var lastTime = 0
-var timeInterval = 0.2
+var timeInterval = 0.01
 var newPosition = new THREE.Vector3()
 var matrix = new THREE.Matrix4()
 var state = 0
@@ -82,18 +83,6 @@ toggleButton.style.left = '10px'
 
 let asciiEffectEnabled = false
 
-//toggleButton.addEventListener('click', () => {
-	//asciiEffectEnabled = !asciiEffectEnabled
-	//effect.domElement.style.display = asciiEffectEnabled ? 'block' : 'none'
-	//renderer.domElement.style.display = asciiEffectEnabled ? 'none' : 'block'
-	// if (asciiEffectEnabled) {
-	// 	controls = new OrbitControls(camera, effect.domElement)
-	// } else {
-	// 	controls = new OrbitControls(camera, renderer.domElement)
-	// }
-//})
-
-// document.body.appendChild(renderer.domElement)
 init()
 function init() {
 	const group1 = new THREE.Group()
@@ -105,12 +94,12 @@ function init() {
 	renderer.domElement.style.position = 'absolute'
 	renderer.domElement.style.top = '0'
 	renderer.domElement.style.left = '0'
-    scene.add( gridHelper )
-	gridHelper.visible = false
+    //scene.add( gridHelper )
+	//gridHelper.visible = false
 	//ASCII
-	effect = new AsciiEffect(renderer, ' 0123456', { invert: true })
+	effect = new AsciiEffect(renderer, ' 01*=0', { invert: true })
 	effect.setSize(width, height)
-	effect.domElement.style.color = '#03F614'
+	effect.domElement.style.color = '#00FFFF'
 	effect.domElement.style.backgroundColor = 'black'
 	effect.domElement.style.position = 'absolute'
 	effect.domElement.style.top = '0'
@@ -175,7 +164,7 @@ function keySetup() {
 		//console.log(keys)
 		if (e.key == 'x'){
 			state += 1
-			if(state > 2){
+			if(state > 1){
 				state = 0
 			}
 		}
@@ -185,8 +174,17 @@ function keySetup() {
 	})
 	window.addEventListener('click', (e) =>{
 		if(e.button===0){
-		shot = true
+			if(lastTime >= timeInterval){
+				shotAmmo()
+				lastTime = 0
+			}
 		}
+	})
+	window.addEventListener('mousedown', (e)=> {
+		shot = true
+	})
+	window.addEventListener('mouseup', (e)=> {
+		shot = false
 	})
 }
 
@@ -250,6 +248,13 @@ function animate() {
 	//console.log(scene.children)
 	//console.log(meshes.group.children)
 	//console.log(meshes.group.children.length)
+	//console.log(shot)
+	document.getElementById("score").textContent = "Score: " + score;
+	document.getElementById("health").textContent = "Health: " + health;
+	if(asciiEffectEnabled){
+	document.getElementById("sneak").textContent = "Sneak Mode" ;}else{
+	document.getElementById("sneak").textContent = "Combat Mode"
+	}
 	if(!shot && meshes.group.children.length > 9){
 		meshes.group.children.splice(7, 1)
 	} 
@@ -274,16 +279,7 @@ function animate() {
 	rotateVertical = 0.0
 	speedVertical = pointer.y / 40
 	rotateHorizontal = -pointer.x / 80
-	if (keys.z){
-		shot = true
-	}else{
-		shot = false
-	}
 	//console.log(ammos)
-	if(shot && lastTime >= timeInterval){
-		shotAmmo()
-		lastTime = 0
-	}
 	for (let i = ammos.length - 1; i >= 0; i--) {
 		meshes.group.add(ammos[i])
         ammos[i].position.add(ammos[i].velocity);
@@ -339,19 +335,18 @@ function animate() {
 	//console.log(state)
 	if(state == 0){
 		asciiEffectEnabled = false
-		gridHelper.visible = false
 	}else if(state == 1){
 		asciiEffectEnabled = true
-		gridHelper.visible = true
-	}else if(state == 1){
-		asciiEffectEnabled = false
-		gridHelper.visible = true}
+	}
 	if (asciiEffectEnabled) {
 		renderer.clear()
-
+		const elem = document.querySelector('canvas')
+		elem.style.display = 'none'
 		effect.render(scene, camera)
 	} else {
 		renderer.clear()
+		const elem = document.querySelector('canvas')
+		elem.style.display = 'block'
 		// renderer.render(scene, camera)
 		composer.composer.render()
 	}
@@ -360,6 +355,11 @@ function animate() {
 	meshes.flame3.rotateX(boost/1.2)
 	meshes.flame4.rotateX(-boost/1.2)
 	
+	if(score >= 300){
+		score = 0
+		alert('--CLEAR--\n'+ score + ' Points')
+       	window.location.reload()
+	}
 
 	// controls.update()
 	if (meshes.ship) {
@@ -379,15 +379,7 @@ function animate() {
 		for(let i = 0; i < meshes.asteroids.length; i++){
 			const shipBox = new THREE.Box3().setFromObject(meshes.ship)
 			const roidBox = new THREE.Box3().setFromObject(meshes.asteroids[i])
-			for(let y = 0; y < ammos.length; y ++){
-				const ammoBox = new THREE.Box3().setFromObject(ammos[y])
-				if(ammoBox.intersectsBox(roidBox)){
-					scene.remove(meshes.asteroids[i])
-					ammos.splice(y, 10)
-					scene.remove(ammos[y])
-				}
-			}
-			if(shipBox.intersectsBox(roidBox)){
+			if(shipBox.intersectsBox(roidBox) && asciiEffectEnabled == false){
 				meshes.group.position.set(0, 0, 0)
 				health -= 10
      			if(health < 1) {

@@ -51,7 +51,7 @@ export function addflame2() {
 	const mesh = new THREE.Mesh(box, material)
 	const edges = new THREE.EdgesGeometry(mesh.geometry, -10)
 	const edgesMaterial = new THREE.LineBasicMaterial({
-	color: 0x66ffff,
+	color: 0x00ffff,
 	})
 	const line = new THREE.LineSegments(edges, edgesMaterial)
 	mesh.add(line)
@@ -149,8 +149,8 @@ export function addAsteroids() {
 	mesh.velocity = Math.random() * 2 + 2
 	mesh.vRotation = new THREE.Vector3(Math.random(), Math.random(), Math.random())
 	mesh.position.set(Math.floor(Math.random() * (max - min + 1)) + min + 5, Math.floor(Math.random() * (max - min + 1)) + min + 5, Math.floor(Math.random() * (max - min + 1)) + min + 5)
-	if(mesh.position.x < 5 && mesh.position.x > -5 || mesh.position.y < 5 && mesh.position.y > -5 || mesh.position.z < 5 && mesh.position.z > -5){
-		mesh.position.set(Math.floor(Math.random() * (max - min + 1)) + min + 5, Math.floor(Math.random() * (max - min + 1)) + min + 5, Math.floor(Math.random() * (max - min + 1)) + min + 5)
+	if(mesh.position.x < 10 && mesh.position.x > -10 || mesh.position.y < 10 && mesh.position.y > -10 || mesh.position.z < 10 && mesh.position.z > -10){
+		mesh.position.set(Math.floor(Math.random() * (max - min + 1)) + min + 10, Math.floor(Math.random() * (max - min + 1)) + min + 10, Math.floor(Math.random() * (max - min + 1)) + min + 10)
 	}
 	asteroids.push(mesh)
 	}
