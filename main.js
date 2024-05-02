@@ -1,7 +1,7 @@
 import './style.css'
 import * as THREE from 'three'
-import { addBoilerPlateMesh, addBoilerPlateMesh2, addflame1, addflame2, aimpoint } from './addMeshes'
-import { addLight, addFlame } from './addLights'
+import { addBoilerPlateMesh, addBoilerPlateMesh2, addflame1, addflame2, aimpoint, addflame3, addflame4 } from './addMeshes'
+import { addLight } from './addLights'
 import Model from './Model'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { postprocessing } from './postprocessing'
@@ -17,11 +17,12 @@ const camera = new THREE.PerspectiveCamera(
 	100
 )
 camera.position.set(0, 1, 0)
+var gridHelper = new THREE.GridHelper( 400, 400, '0x84ffff');
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 var ammos = []
 var lastTime = 0
-var timeInterval = 50
+var timeInterval = 0.2
 var newPosition = new THREE.Vector3()
 var matrix = new THREE.Matrix4()
 var state = 0
@@ -102,9 +103,8 @@ function init() {
 	renderer.domElement.style.position = 'absolute'
 	renderer.domElement.style.top = '0'
 	renderer.domElement.style.left = '0'
-	var gridHelper = new THREE.GridHelper( 400, 400 );
-	//gridHelper.layers.set(1)
-    //scene.add( gridHelper );
+    scene.add( gridHelper )
+	gridHelper.visible = false
 	//ASCII
 	effect = new AsciiEffect(renderer, ' 0123456', { invert: true })
 	effect.setSize(width, height)
@@ -124,16 +124,18 @@ function init() {
 	meshes.default2 = addBoilerPlateMesh2()
 	meshes.flame1 = addflame1()
 	meshes.flame2 = addflame2()
+	meshes.flame3 = addflame3()
+	meshes.flame4 = addflame4()
 	meshes.asteroids = addAsteroids()
 	meshes.aimpoint = aimpoint()
 	lights.defaultLight = addLight()
-	lights.flame = addFlame()
 	meshes.group = group1
 	meshes.group.add(meshes.default)
 	meshes.group.add(meshes.default2)
-	meshes.group.add(lights.flame)
 	meshes.group.add(meshes.flame1)
 	meshes.group.add(meshes.flame2)
+	meshes.group.add(meshes.flame3)
+	meshes.group.add(meshes.flame4)
 	meshes.group.add(meshes.aimpoint)
 	//lights
 	for(let i = 0; i < meshes.asteroids.length; i++){
@@ -185,8 +187,6 @@ function keySetup() {
 
 
 function shotAmmo() {
-	var currentTime = Date.now()
-	if(currentTime - lastTime >= timeInterval){
 	var bulletSpeed = 1
 	var position = new THREE.Vector3();
     position.copy(raycaster.ray.origin);
@@ -206,8 +206,6 @@ function shotAmmo() {
 	ammo.velocity = direction.clone().multiplyScalar(bulletSpeed)
 	scene.add(ammo)
 	ammos.push(ammo)
-}
-	lastTime = currentTime
 	
 }
 
@@ -242,9 +240,15 @@ function resize() {
 
 function animate() {
 	window.addEventListener( 'pointermove', onPointerMove );
-	//console.log(scene.children)
-	boost = 0.02
+	console.log(scene.children)
+	console.log(meshes.group.children)
+	console.log(meshes.group.children.length)
+	if(!shot && meshes.group.children.length > 9){
+		meshes.group.children.splice(7, 1)
+	} 
 	const delta = clock.getDelta()
+	lastTime += delta
+	boost = 0.02
 	meshes.default.rotation.x += 0.01
 	meshes.default.rotation.z += 0.01
 	meshes.default2.rotation.x += 0.01
@@ -268,9 +272,10 @@ function animate() {
 	}else{
 		shot = false
 	}
-	if(shot){
+	//console.log(ammos)
+	if(shot && lastTime >= timeInterval){
 		shotAmmo()
-		//console.log(ammos)
+		lastTime = 0
 	}
 	for (let i = ammos.length - 1; i >= 0; i--) {
 		meshes.group.add(ammos[i])
@@ -284,9 +289,9 @@ function animate() {
             for (let j = meshes.asteroids.length - 1; j >= 0; j--) {
                 const roidBox = new THREE.Box3().setFromObject(meshes.asteroids[j]);
                 if (ammoBox.intersectsBox(roidBox)) {
+					meshes.group.remove(ammos[i])
                     scene.remove(meshes.asteroids[j]);
                     meshes.asteroids.splice(j, 1);
-					meshes.group.remove(ammos[i])
                     scene.remove(ammos[i]);
                     ammos.splice(i, 1);
                     break;
@@ -326,10 +331,13 @@ function animate() {
 	//console.log(state)
 	if(state === 0){
 		asciiEffectEnabled = false
+		gridHelper.visible = false
 	}else if(state === 1){
 		asciiEffectEnabled = true
+		gridHelper.visible = true
 	}else if(state === 2){
 		asciiEffectEnabled = false
+		gridHelper.visible = false
 	}
 	if (asciiEffectEnabled) {
 		renderer.clear()
@@ -342,6 +350,8 @@ function animate() {
 	}
 	meshes.flame1.rotateZ(-boost)
 	meshes.flame2.rotateZ(boost)
+	meshes.flame3.rotateX(boost/1.2)
+	meshes.flame4.rotateX(-boost/1.2)
 	
 
 	// controls.update()

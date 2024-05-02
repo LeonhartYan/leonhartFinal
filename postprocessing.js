@@ -39,7 +39,7 @@ export function postprocessing(scene, camera, renderer, state) {
 	composer.addPass(outlinePass)
 	const afterPass = new AfterimagePass()
 	afterPass.uniforms.damp.value = 0.7
-	afterPass.damp = 0.1
+	afterPass.damp = 1
 	composer.addPass(afterPass)
 	const bloomPass = new UnrealBloomPass()
 	bloomPass.strength = 0.5
