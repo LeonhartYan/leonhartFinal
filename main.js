@@ -1,6 +1,6 @@
 import './style.css'
 import * as THREE from 'three'
-import { addBoilerPlateMesh, addBoilerPlateMesh2, addflame1, addflame2 } from './addMeshes'
+import { addBoilerPlateMesh, addBoilerPlateMesh2, addflame1, addflame2, aimpoint } from './addMeshes'
 import { addLight, addFlame } from './addLights'
 import Model from './Model'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
@@ -16,11 +16,12 @@ const camera = new THREE.PerspectiveCamera(
 	0.1,
 	100
 )
-camera.position.set(0, 1.25, 0)
+camera.position.set(0, 1, 0)
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 var ammos = []
-var time = 0
+var lastTime = 0
+var timeInterval = 50
 var newPosition = new THREE.Vector3()
 var matrix = new THREE.Matrix4()
 var state = 0
@@ -124,6 +125,7 @@ function init() {
 	meshes.flame1 = addflame1()
 	meshes.flame2 = addflame2()
 	meshes.asteroids = addAsteroids()
+	meshes.aimpoint = aimpoint()
 	lights.defaultLight = addLight()
 	lights.flame = addFlame()
 	meshes.group = group1
@@ -132,6 +134,7 @@ function init() {
 	meshes.group.add(lights.flame)
 	meshes.group.add(meshes.flame1)
 	meshes.group.add(meshes.flame2)
+	meshes.group.add(meshes.aimpoint)
 	//lights
 	for(let i = 0; i < meshes.asteroids.length; i++){
 		meshes.asteroids[i].rotateY(Math.random() * 40)
@@ -154,9 +157,6 @@ function init() {
 	keySetup()
 	models()
 	resize()
-	if(shot){
-		setTimeout(shotAmmo(), 200)
-	}
 	animate()
 }
 function onPointerMove( event ) {
@@ -168,7 +168,7 @@ function onPointerMove( event ) {
 function keySetup() {
 	window.addEventListener('keydown', (e) => {
 		if (keys[e.key] !== undefined) keys[e.key] = true
-		console.log(keys)
+		//console.log(keys)
 		if (e.key == 'x'){
 			state += 1
 		}
@@ -177,18 +177,23 @@ function keySetup() {
 		if (keys[e.key] !== undefined) keys[e.key] = false
 	})
 	window.addEventListener('click', (e) =>{
+		if(e.button===0){
 		shot = true
+		}
 	})
 }
 
+
 function shotAmmo() {
+	var currentTime = Date.now()
+	if(currentTime - lastTime >= timeInterval){
 	var bulletSpeed = 1
 	var position = new THREE.Vector3();
     position.copy(raycaster.ray.origin);
     var direction = new THREE.Vector3();
     direction.copy(raycaster.ray.direction);
 	direction.clone().multiplyScalar(bulletSpeed);
-	const ammoDia = new THREE.SphereGeometry(0.3)
+	const ammoDia = new THREE.SphereGeometry(0.5)
 	const ammoMat = new THREE.MeshBasicMaterial({
 			color: 0xa9fef9,
 			transparent: true,
@@ -201,7 +206,8 @@ function shotAmmo() {
 	ammo.velocity = direction.clone().multiplyScalar(bulletSpeed)
 	scene.add(ammo)
 	ammos.push(ammo)
-	meshes.group.add(ammo)
+}
+	lastTime = currentTime
 	
 }
 
@@ -264,16 +270,30 @@ function animate() {
 	}
 	if(shot){
 		shotAmmo()
-		console.log(ammos)
-		for(let x; x < ammos.length; x ++){
-		if(ammos[x].position.z - camera.position.z > 80 || ammos[x].position.z - camera.position.z < -80){
-			ammos.splice(x, 1)
-		}
+		//console.log(ammos)
 	}
+	for (let i = ammos.length - 1; i >= 0; i--) {
+		meshes.group.add(ammos[i])
+        ammos[i].position.add(ammos[i].velocity);
+        if (ammos[i].position.distanceTo(camera.position) > 100) {
+			meshes.group.remove(ammos[i])
+            scene.remove(ammos[i]);
+            ammos.splice(i, 1);
+        } else {
+            const ammoBox = new THREE.Box3().setFromObject(ammos[i]);
+            for (let j = meshes.asteroids.length - 1; j >= 0; j--) {
+                const roidBox = new THREE.Box3().setFromObject(meshes.asteroids[j]);
+                if (ammoBox.intersectsBox(roidBox)) {
+                    scene.remove(meshes.asteroids[j]);
+                    meshes.asteroids.splice(j, 1);
+					meshes.group.remove(ammos[i])
+                    scene.remove(ammos[i]);
+                    ammos.splice(i, 1);
+                    break;
+                }
+            }
+        }
 	}
-	ammos.forEach((ammo) => {
-		ammo.position.add(ammo.velocity)
-	})
 	if (keys.e) {speedVertical = -0.03
 		speedHorizontal = -0.01
 		boost = 1}
@@ -303,7 +323,7 @@ function animate() {
 	//if(keys.x){
 		//state += 1
 	//}
-	console.log(state)
+	//console.log(state)
 	if(state === 0){
 		asciiEffectEnabled = false
 	}else if(state === 1){

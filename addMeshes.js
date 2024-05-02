@@ -49,13 +49,25 @@ export function addflame2() {
 	const mesh = new THREE.Mesh(box, material)
 	const edges = new THREE.EdgesGeometry(mesh.geometry, -10)
 	const edgesMaterial = new THREE.LineBasicMaterial({
-	color: 0x00ffff,
+	color: 0x66ffff,
 	})
 	const line = new THREE.LineSegments(edges, edgesMaterial)
 	mesh.add(line)
 	mesh.position.set(-1.12, -0.1, 2)
 	mesh.rotation.y = 0.2
 	mesh.rotation.z = 0.25
+	return mesh
+}
+
+export function aimpoint(){
+	const geometry = new THREE.SphereGeometry(0.5)
+	const material = new THREE.MeshBasicMaterial({
+			color: 0x84ffff,
+			transparent: true,
+			opacity: 0.5		
+		})
+	const mesh = new THREE.Mesh(geometry, material)
+	mesh.position.set(0, 0, -20)
 	return mesh
 }
 
