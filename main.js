@@ -19,10 +19,11 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(0, 1.25, 0)
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
+var ammos = []
 var time = 0
 var newPosition = new THREE.Vector3()
 var matrix = new THREE.Matrix4()
-var state
+var state = 0
 var shot = false
 var stop = 1
 var DEGTORAD = 0.01745327
@@ -153,7 +154,9 @@ function init() {
 	keySetup()
 	models()
 	resize()
-	shotAmmo()
+	if(shot){
+		setTimeout(shotAmmo(), 200)
+	}
 	animate()
 }
 function onPointerMove( event ) {
@@ -166,29 +169,40 @@ function keySetup() {
 	window.addEventListener('keydown', (e) => {
 		if (keys[e.key] !== undefined) keys[e.key] = true
 		console.log(keys)
+		if (e.key == 'x'){
+			state += 1
+		}
 	})
 	window.addEventListener('keyup', (e) => {
 		if (keys[e.key] !== undefined) keys[e.key] = false
 	})
+	window.addEventListener('click', (e) =>{
+		shot = true
+	})
 }
 
 function shotAmmo() {
-	var ammos = []
+	var bulletSpeed = 1
 	var position = new THREE.Vector3();
     position.copy(raycaster.ray.origin);
     var direction = new THREE.Vector3();
     direction.copy(raycaster.ray.direction);
-	if (shot == true){
+	direction.clone().multiplyScalar(bulletSpeed);
 	const ammoDia = new THREE.SphereGeometry(0.3)
 	const ammoMat = new THREE.MeshBasicMaterial({
-			color: 0xff0000,
+			color: 0xa9fef9,
 			transparent: true,
 			opacity: 0.5		
 		})
 	const ammo = new THREE.Mesh(ammoDia, ammoMat)
 	ammo.position.copy(position)
-		ammos.push(ammo)
-	}
+	ammo.position.y = 0
+	ammo.position.z = -0.8
+	ammo.velocity = direction.clone().multiplyScalar(bulletSpeed)
+	scene.add(ammo)
+	ammos.push(ammo)
+	meshes.group.add(ammo)
+	
 }
 
 function models() {
@@ -222,6 +236,7 @@ function resize() {
 
 function animate() {
 	window.addEventListener( 'pointermove', onPointerMove );
+	//console.log(scene.children)
 	boost = 0.02
 	const delta = clock.getDelta()
 	meshes.default.rotation.x += 0.01
@@ -244,7 +259,21 @@ function animate() {
 	rotateHorizontal = -pointer.x / 80
 	if (keys.z){
 		shot = true
+	}else{
+		shot = false
 	}
+	if(shot){
+		shotAmmo()
+		console.log(ammos)
+		for(let x; x < ammos.length; x ++){
+		if(ammos[x].position.z - camera.position.z > 80 || ammos[x].position.z - camera.position.z < -80){
+			ammos.splice(x, 1)
+		}
+	}
+	}
+	ammos.forEach((ammo) => {
+		ammo.position.add(ammo.velocity)
+	})
 	if (keys.e) {speedVertical = -0.03
 		speedHorizontal = -0.01
 		boost = 1}
@@ -271,9 +300,10 @@ function animate() {
 	velocityHoriontal += (speedHorizontal - velocityHoriontal) * 0.5
 	velocityHoriontal2 += (speedHorizontal2 - velocityHoriontal2) * 0.5
 	
-	if(keys.x){
-		state += 1
-	}
+	//if(keys.x){
+		//state += 1
+	//}
+	console.log(state)
 	if(state === 0){
 		asciiEffectEnabled = false
 	}else if(state === 1){
@@ -312,6 +342,14 @@ function animate() {
 		for(let i = 0; i < meshes.asteroids.length; i++){
 			const shipBox = new THREE.Box3().setFromObject(meshes.ship)
 			const roidBox = new THREE.Box3().setFromObject(meshes.asteroids[i])
+			for(let y = 0; y < ammos.length; y ++){
+				const ammoBox = new THREE.Box3().setFromObject(ammos[y])
+				if(ammoBox.intersectsBox(roidBox)){
+					scene.remove(meshes.asteroids[i])
+					ammos.splice(y, 10)
+					scene.remove(ammos[y])
+				}
+			}
 			if(shipBox.intersectsBox(roidBox)){
 				meshes.group.position.set(0, 0, 0)
 				break
