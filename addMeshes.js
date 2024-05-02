@@ -104,7 +104,7 @@ export function aimpoint(){
 	const material = new THREE.MeshLambertMaterial({
 			color: 0x84ffff,
 			transparent: true,
-			opacity: 0.1,		
+			opacity: 0,		
 		})
 	const mesh = new THREE.Mesh(geometry, material)
 	const edges = new THREE.EdgesGeometry(mesh.geometry, -10)

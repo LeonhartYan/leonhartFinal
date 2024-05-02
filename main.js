@@ -20,6 +20,8 @@ camera.position.set(0, 1, 0)
 var gridHelper = new THREE.GridHelper( 400, 400, '0x84ffff');
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
+var score = 0
+var health = 100
 var ammos = []
 var lastTime = 0
 var timeInterval = 0.2
@@ -147,7 +149,7 @@ function init() {
 	meshes.default.scale.set(2, 2, 2)
 	meshes.default2.scale.set(2, 2, 2)
 
-	composer = postprocessing(scene, camera, renderer, state)
+	composer = postprocessing(scene, camera, renderer)
 
 	goal.add(camera)
 	//scene operations
@@ -173,6 +175,9 @@ function keySetup() {
 		//console.log(keys)
 		if (e.key == 'x'){
 			state += 1
+			if(state > 2){
+				state = 0
+			}
 		}
 	})
 	window.addEventListener('keyup', (e) => {
@@ -202,7 +207,7 @@ function shotAmmo() {
 	const ammo = new THREE.Mesh(ammoDia, ammoMat)
 	ammo.position.copy(position)
 	ammo.position.y = 0
-	ammo.position.z = -0.8
+	ammo.position.z = -5
 	ammo.velocity = direction.clone().multiplyScalar(bulletSpeed)
 	scene.add(ammo)
 	ammos.push(ammo)
@@ -225,6 +230,8 @@ function models() {
 	Ship.init()
 }
 
+
+
 function resize() {
 	window.addEventListener('resize', () => {
 		const width = window.innerWidth
@@ -240,9 +247,9 @@ function resize() {
 
 function animate() {
 	window.addEventListener( 'pointermove', onPointerMove );
-	console.log(scene.children)
-	console.log(meshes.group.children)
-	console.log(meshes.group.children.length)
+	//console.log(scene.children)
+	//console.log(meshes.group.children)
+	//console.log(meshes.group.children.length)
 	if(!shot && meshes.group.children.length > 9){
 		meshes.group.children.splice(7, 1)
 	} 
@@ -265,7 +272,7 @@ function animate() {
 	speedHorizontal2 = 0.0
 	rotateHorizontal = 0.0
 	rotateVertical = 0.0
-	speedVertical = pointer.y / 60
+	speedVertical = pointer.y / 40
 	rotateHorizontal = -pointer.x / 80
 	if (keys.z){
 		shot = true
@@ -289,6 +296,7 @@ function animate() {
             for (let j = meshes.asteroids.length - 1; j >= 0; j--) {
                 const roidBox = new THREE.Box3().setFromObject(meshes.asteroids[j]);
                 if (ammoBox.intersectsBox(roidBox)) {
+					score += 10
 					meshes.group.remove(ammos[i])
                     scene.remove(meshes.asteroids[j]);
                     meshes.asteroids.splice(j, 1);
@@ -329,16 +337,15 @@ function animate() {
 		//state += 1
 	//}
 	//console.log(state)
-	if(state === 0){
+	if(state == 0){
 		asciiEffectEnabled = false
 		gridHelper.visible = false
-	}else if(state === 1){
+	}else if(state == 1){
 		asciiEffectEnabled = true
 		gridHelper.visible = true
-	}else if(state === 2){
+	}else if(state == 1){
 		asciiEffectEnabled = false
-		gridHelper.visible = false
-	}
+		gridHelper.visible = true}
 	if (asciiEffectEnabled) {
 		renderer.clear()
 
@@ -382,6 +389,11 @@ function animate() {
 			}
 			if(shipBox.intersectsBox(roidBox)){
 				meshes.group.position.set(0, 0, 0)
+				health -= 10
+     			if(health < 1) {
+       				alert('Game Over\n'+ score + ' Points')
+       				window.location.reload()
+				}
 				break
 			}
 		}

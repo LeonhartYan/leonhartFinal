@@ -8,7 +8,7 @@ import { RenderPixelatedPass } from 'three/examples/jsm/postprocessing/RenderPix
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js'
 import { Mesh, Vector2 } from 'three'
 
-export function postprocessing(scene, camera, renderer, state) {
+export function postprocessing(scene, camera, renderer) {
 	console.log(camera)
 	const composer = new EffectComposer(renderer)
 	composer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -22,7 +22,7 @@ export function postprocessing(scene, camera, renderer, state) {
 
 	const pixelPass = new RenderPixelatedPass(2, scene, camera)
 	pixelPass.normalEdgeStrength = 2
-	pixelPass.pixelSize = 5
+	pixelPass.pixelSize = 3.3
 	pixelPass.enabled = false
 	composer.addPass(pixelPass)
 	const outlinePass = new OutlinePass(
@@ -42,7 +42,7 @@ export function postprocessing(scene, camera, renderer, state) {
 	afterPass.damp = 1
 	composer.addPass(afterPass)
 	const bloomPass = new UnrealBloomPass()
-	bloomPass.strength = 0.5
+	bloomPass.strength = 0.45
 	//bloomPass.enabled = false
 	composer.addPass(bloomPass)
 	const outputPass = new OutputPass()
