@@ -21,6 +21,8 @@ camera.position.set(0, 1, 0)
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 var score = 0
+var win = false
+var lose = false
 var health = 100
 var sneak = false
 var ammos = []
@@ -327,8 +329,6 @@ function animate() {
 	}
 	velocityVertical += (speedVertical - velocityVertical) * 0.5
 	velocityHoriontal += (speedHorizontal - velocityHoriontal) * 0.5
-	velocityHoriontal2 += (speedHorizontal2 - velocityHoriontal2) * 0.5
-	
 	//if(keys.x){
 		//state += 1
 	//}
@@ -343,12 +343,20 @@ function animate() {
 		const elem = document.querySelector('canvas')
 		elem.style.display = 'none'
 		effect.render(scene, camera)
+		velocityVertical += (speedVertical - velocityVertical)
+		velocityHoriontal += (speedHorizontal - velocityHoriontal)
+		speedVertical = pointer.y / 20
+		rotateHorizontal = -pointer.x / 40
 	} else {
 		renderer.clear()
 		const elem = document.querySelector('canvas')
 		elem.style.display = 'block'
 		// renderer.render(scene, camera)
 		composer.composer.render()
+		velocityVertical += (speedVertical - velocityVertical) /2
+		velocityHoriontal += (speedHorizontal - velocityHoriontal) /2
+		speedVertical = pointer.y / 40
+		rotateHorizontal = -pointer.x / 80
 	}
 	meshes.flame1.rotateZ(-boost)
 	meshes.flame2.rotateZ(boost)
@@ -356,9 +364,17 @@ function animate() {
 	meshes.flame4.rotateX(-boost/1.2)
 	
 	if(score >= 300){
-		score = 0
+		win = true
+	}
+	if(win){
 		alert('--CLEAR--\n'+ score + ' Points')
        	window.location.reload()
+		win = false
+	}
+	if(lose){
+		alert('Game Over\n'+ score + ' Points')
+       	window.location.reload()
+		lose = false
 	}
 
 	// controls.update()
@@ -383,8 +399,7 @@ function animate() {
 				meshes.group.position.set(0, 0, 0)
 				health -= 10
      			if(health < 1) {
-       				alert('Game Over\n'+ score + ' Points')
-       				window.location.reload()
+       				lose = true
 				}
 				break
 			}
