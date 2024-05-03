@@ -151,6 +151,8 @@ export function addAsteroids() {
 	mesh.position.set(Math.floor(Math.random() * (max - min + 1)) + min + 5, Math.floor(Math.random() * (max - min + 1)) + min + 5, Math.floor(Math.random() * (max - min + 1)) + min + 5)
 	if(mesh.position.x < 3 && mesh.position.x > -3 || mesh.position.y < 3 && mesh.position.y > -3 || mesh.position.z < 3 && mesh.position.z > -3){
 		mesh.position.set(Math.floor(Math.random() * (max - min + 1)) + min + 10, Math.floor(Math.random() * (max - min + 1)) + min + 10, Math.floor(Math.random() * (max - min + 1)) + min + 10)
+	}else if(mesh.position.x < 3 && mesh.position.x > -3 || mesh.position.y < 3 && mesh.position.y > -3 || mesh.position.z < 3 && mesh.position.z > -3){
+		mesh.position.set(Math.floor(Math.random() * (max - min + 1)) + max + 10, Math.floor(Math.random() * (max - min + 1)) + max + 10, Math.floor(Math.random() * (max - min + 1)) + max + 10)
 	}
 	asteroids.push(mesh)
 	}
