@@ -149,7 +149,7 @@ export function addAsteroids() {
 	mesh.velocity = Math.random() * 2 + 2
 	mesh.vRotation = new THREE.Vector3(Math.random(), Math.random(), Math.random())
 	mesh.position.set(Math.floor(Math.random() * (max - min + 1)) + min + 5, Math.floor(Math.random() * (max - min + 1)) + min + 5, Math.floor(Math.random() * (max - min + 1)) + min + 5)
-	if(mesh.position.x < 10 && mesh.position.x > -10 || mesh.position.y < 10 && mesh.position.y > -10 || mesh.position.z < 10 && mesh.position.z > -10){
+	if(mesh.position.x < 3 && mesh.position.x > -3 || mesh.position.y < 3 && mesh.position.y > -3 || mesh.position.z < 3 && mesh.position.z > -3){
 		mesh.position.set(Math.floor(Math.random() * (max - min + 1)) + min + 10, Math.floor(Math.random() * (max - min + 1)) + min + 10, Math.floor(Math.random() * (max - min + 1)) + min + 10)
 	}
 	asteroids.push(mesh)
