@@ -47,6 +47,7 @@ var speedHorizontal = 0.0
 var speedHorizontal2 = 0.0
 var rotateHorizontal = 0.0
 var rotateVertical = 0.0
+var pointerSpd = 0.0
 var boost = 0.0
 let goal, follow
 const keys = {
@@ -279,8 +280,10 @@ function animate() {
 	speedHorizontal2 = 0.0
 	rotateHorizontal = 0.0
 	rotateVertical = 0.0
+	pointerSpd = 80.0
+	var pspd2 = pointerSpd / 2
 	speedVertical = pointer.y / 40
-	rotateHorizontal = -pointer.x / 80
+	rotateHorizontal = -pointer.x / pointerSpd
 	//console.log(ammos)
 	for (let i = ammos.length - 1; i >= 0; i--) {
 		meshes.group.add(ammos[i])
@@ -343,10 +346,9 @@ function animate() {
 		const elem = document.querySelector('canvas')
 		elem.style.display = 'none'
 		effect.render(scene, camera)
-		velocityVertical += (speedVertical - velocityVertical)
-		velocityHoriontal += (speedHorizontal - velocityHoriontal)
-		speedVertical = pointer.y / 20
-		rotateHorizontal = -pointer.x / 40
+		velocityVertical += (speedVertical - velocityVertical) * 2
+		velocityHoriontal += (speedHorizontal - velocityHoriontal) * 2
+		pointerSpd = 120.0
 	} else {
 		renderer.clear()
 		const elem = document.querySelector('canvas')
@@ -355,8 +357,7 @@ function animate() {
 		composer.composer.render()
 		velocityVertical += (speedVertical - velocityVertical) /2
 		velocityHoriontal += (speedHorizontal - velocityHoriontal) /2
-		speedVertical = pointer.y / 40
-		rotateHorizontal = -pointer.x / 80
+		pointerSpd = 80.0
 	}
 	meshes.flame1.rotateZ(-boost)
 	meshes.flame2.rotateZ(boost)
