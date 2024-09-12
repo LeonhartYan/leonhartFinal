@@ -29,7 +29,7 @@ body {
 	min-width: 320px;
 	min-height: 100vh;
     padding: 0;
-    background-image: url('bg.jpg'); /* 替换为游戏截图路径 */
+    background-image: url('public/bg.jpg'); /* 替换为游戏截图路径 */
     background-size: cover; /* 背景自动适应大小 */
     background-position: center; /* 背景居中 */
     background-repeat: no-repeat; /* 背景不重复 */
