@@ -88,6 +88,7 @@ let asciiEffectEnabled = false
 
 init()
 function init() {
+	createTapToStartButton()
 	const group1 = new THREE.Group()
 	camera.lookAt(scene.position)
 	const width = window.innerWidth
@@ -150,7 +151,6 @@ function init() {
 		scene.add(meshes.asteroids[i])
 	}
 	scene.add(lights.defaultLight)
-	createTapToStartButton()
 	keySetup()
 	models()
 	resize()
@@ -161,7 +161,7 @@ function createTapToStartButton() {
     button = document.createElement('button')
     button.textContent = 'Tap to Start'
     button.style.position = 'absolute'
-    button.style.bottom = '50px'
+    button.style.bottom = '500px'
     button.style.left = '50%'
     button.style.transform = 'translateX(-50%)'
     button.style.padding = '20px'
