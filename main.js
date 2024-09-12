@@ -50,6 +50,8 @@ var rotateVertical = 0.0
 var pointerSpd = 0.0
 var boost = 0.0
 let goal, follow
+let gameStarted = false // Track if the game has started
+let button 
 const keys = {
 	a: false,
 	s: false,
