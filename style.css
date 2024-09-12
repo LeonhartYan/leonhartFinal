@@ -29,10 +29,10 @@ body {
 	min-width: 320px;
 	min-height: 100vh;
     padding: 0;
-    background-image: url('public/bg.jpg'); /* 替换为游戏截图路径 */
-    background-size: cover; /* 背景自动适应大小 */
-    background-position: center; /* 背景居中 */
-    background-repeat: no-repeat; /* 背景不重复 */
+    background-image: url('public/bg.jpg');
+    background-size: cover; 
+    background-position: center; 
+    background-repeat: no-repeat; 
 }
 
 h1 {
@@ -124,4 +124,21 @@ canvas {
 }
 #sneak {
     top: 110px;
+}
+#game-instructions {
+    position: absolute;
+    top: 30vh; /* 使文本在页面中居中显示 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%; /* 控制说明文本的宽度 */
+    text-align: center;
+    font-family: 'Courier New', monospace; /* 字体样式 */
+    font-size: 18px; /* 控制字体大小 */
+    color: #00FFFF; /* 文字颜色，匹配其他 UI 元素 */
+    z-index: 9; /* 保证文本在最前面显示 */
+    line-height: 1.5;
+    background-color: rgba(0, 0, 0, 0.7); /* 使背景半透明，便于阅读 */
+    padding: 20px;
+    border-radius: 10px;
+    user-select: none; /* 防止文本被选中 */
 }

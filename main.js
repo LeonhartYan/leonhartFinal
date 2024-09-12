@@ -180,6 +180,7 @@ function createTapToStartButton() {
 
 function startGame() {
     gameStarted = true
+	document.getElementById('game-instructions').style.display = 'none'; 
     button.style.display = 'none' // Hide the button after the game starts
     animate() // Start the game animation loop
 }
