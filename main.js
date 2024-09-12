@@ -150,11 +150,36 @@ function init() {
 		scene.add(meshes.asteroids[i])
 	}
 	scene.add(lights.defaultLight)
+	createTapToStartButton()
 	keySetup()
 	models()
 	resize()
-	animate()
+	button.addEventListener('click', startGame)
 }
+
+function createTapToStartButton() {
+    button = document.createElement('button')
+    button.textContent = 'Tap to Start'
+    button.style.position = 'absolute'
+    button.style.bottom = '50px'
+    button.style.left = '50%'
+    button.style.transform = 'translateX(-50%)'
+    button.style.padding = '20px'
+    button.style.fontSize = '24px'
+    button.style.backgroundColor = '#00FFFF'
+    button.style.color = '#000'
+    button.style.border = 'none'
+    button.style.cursor = 'pointer'
+    button.style.zIndex = '10'
+    document.body.appendChild(button)
+}
+
+function startGame() {
+    gameStarted = true
+    button.style.display = 'none' // Hide the button after the game starts
+    animate() // Start the game animation loop
+}
+
 function onPointerMove( event ) {
 	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -247,6 +272,7 @@ function resize() {
 }
 
 function animate() {
+	if (!gameStarted) return
 	window.addEventListener( 'pointermove', onPointerMove );
 	//console.log(scene.children)
 	//console.log(meshes.group.children)
