@@ -165,7 +165,7 @@ function createTapToStartButton() {
 	button.style.fontWeight = 'bold'
     button.textContent = 'Tap to Start'
     button.style.position = 'absolute'
-    button.style.bottom = '300px'
+    button.style.bottom = '10vh'
     button.style.left = '50%'
     button.style.transform = 'translateX(-50%)'
     button.style.padding = '20px'

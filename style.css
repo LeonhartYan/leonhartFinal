@@ -28,7 +28,11 @@ body {
 	place-items: center;
 	min-width: 320px;
 	min-height: 100vh;
-	background-image: url(bg.png);
+    padding: 0;
+    background-image: url('bg,png'); /* 替换为游戏截图路径 */
+    background-size: cover; /* 背景自动适应大小 */
+    background-position: center; /* 背景居中 */
+    background-repeat: no-repeat; /* 背景不重复 */
 }
 
 h1 {
