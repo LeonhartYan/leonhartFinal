@@ -161,6 +161,8 @@ function init() {
 
 function createTapToStartButton() {
     button = document.createElement('button')
+	button.style.fontFamily = "'Courier New', monospace"
+	button.style.fontWeight = 'bold'
     button.textContent = 'Tap to Start'
     button.style.position = 'absolute'
     button.style.bottom = '300px'
@@ -169,7 +171,6 @@ function createTapToStartButton() {
     button.style.padding = '20px'
     button.style.fontSize = '24px'
     button.style.backgroundColor = '#00FFFF'
-	button.style.fontFamily = "'Courier New', monospace"
     button.style.color = '#000'
     button.style.border = 'none'
     button.style.cursor = 'pointer'
